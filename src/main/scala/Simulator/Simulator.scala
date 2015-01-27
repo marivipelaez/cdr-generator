@@ -55,6 +55,7 @@ class BasicSimulator(
 						randomCentralCDR(u, central, day)
 						)
 		}
+    
 		cdrs ++ centralCdrs
 	}
 

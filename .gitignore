@@ -6,3 +6,10 @@ tags
 
 #Backup file
 *~
+/bin/
+/target/
+.project
+.cache
+.classpath
+.settings
+*test.txt*
