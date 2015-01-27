@@ -9,6 +9,7 @@ import generator.operators._
 import generator.cells._
 import generator.socialnetwork._
 import simulator._
+import model.DefaultCDR
 
 object CDRSimulation{
 	def main(args: Array[String]){
@@ -18,7 +19,9 @@ object CDRSimulation{
 			new BasicUsersGenerator(50),
 			new RandomSocialNetworkGenerator()
 		)
-		sim.simulate(new DateTime).map(_.toString)saveAsTextFile("test.txt")
+    val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(",").split(",").map(_.toString))
+    val cdrs = sim.simulate(new DateTime).map(_.toString)
+    header.union(cdrs).saveAsTextFile("test.txt")
     sc.stop()
 	}
 }
