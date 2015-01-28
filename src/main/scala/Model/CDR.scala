@@ -1,4 +1,6 @@
 package model
+
+import com.github.nscala_time.time._
 import com.github.nscala_time.time.Imports._
 
 import java.util.Random
@@ -84,7 +86,7 @@ object TAC{
 
 /** Represent a CDR
  * @param fromUser          User who call/SMS
- * @param toUser            User who recieve the call/SMS
+ * @param toUser            User who receive the call/SMS
  * @param fromCell          The cell from which fromUser call/SMS
  * @param toCell            The cell from which toUser call/SMS
  * @param date              The date of the call/SMS
@@ -93,7 +95,7 @@ object TAC{
  * @param fromTerminationStatus How the call/SMS terminated (from)
  * @param toTerminationStatus How the call/SMS terminated (to)
  * @param fromValue             Cost of the caller
- * @param toValue             Cost of the reciever
+ * @param toValue             Cost of the receiver
  * @param transitType       OnNet/OffNet call/SMS
  * @param fromTac               Device TAC of the caller
  * @param toTac               Device TAC of the receiver
@@ -147,7 +149,7 @@ class CDR(
 			"OPERATOR_1" -> fromUser.operator.name,
 			"OPERATOR_2" -> toUser.operator.name,
 			"DURATION" -> duration.toString,
-			"TIMESTAMP" -> date.toString("%y%m%d%h%s"),
+			"TIMESTAMP" -> date.toString(StaticDateTimeFormat.forPattern("yyyyMMddhhmmss")),
 			"TERMINATION_STATUS_1" -> TerminationStatus.toString(fromTerminationStatus),
 			"TERMINATION_STATUS_2" -> TerminationStatus.toString(toTerminationStatus),
 			"VALUE_1" -> fromValue.toString,
