@@ -31,19 +31,19 @@ abstract class User( val id: Long, var operator : Operator) extends Serializable
 	/** Compute how probable is it for this user to call that date.
 	 *
 	 * @param  date		  The date of the call
-	 * @return					The propability that the user call
+	 * @return					The probability that the user call
 	 */
 	def probabilityToCall(date : DateTime): Double
 
 	/** Compute how probable is it for this user to SMS that date.
 	 *
 	 * @param  date		  The date of the SMS
-	 * @return					The propability that the user SMS
+	 * @return					The probability that the user SMS
 	 */
 	def probabilityToSMS(date : DateTime): Double
 
 	/** In function of the position of the user at that time, compute the cell to 
-	 * which he we'll be connected.
+	 * which he will be connected.
 	 *
 	 * @param  date DateTime
 	 * @return      Cell
@@ -65,7 +65,7 @@ abstract class User( val id: Long, var operator : Operator) extends Serializable
 	 */
 	def callerCost(to: User, date: DateTime, duration: Int, cdrType: CDRType): Double
 
-	/** Compute the cost for this user to recieve a call/SMS (cdrType) from the
+	/** Compute the cost for this user to receive a call/SMS (cdrType) from the
 	 * user from at that date for that duration.
 	 * @param  from     The user who call/SMS this user
 	 * @param  date     The date of the call/SMS
