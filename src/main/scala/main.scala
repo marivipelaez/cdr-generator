@@ -1,6 +1,7 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
+import com.github.nscala_time.time._
 import com.github.nscala_time.time.Imports._
 
 import spark.Spark.sc
@@ -10,6 +11,7 @@ import generator.cells._
 import generator.socialnetwork._
 import simulator._
 import model.DefaultCDR
+import model.CDR
 
 object CDRSimulation{
 	def main(args: Array[String]){
@@ -19,9 +21,9 @@ object CDRSimulation{
 			new BasicUsersGenerator(50),
 			new RandomSocialNetworkGenerator()
 		)
-    val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(",").split(",").map(_.toString))
+    val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
     val cdrs = sim.simulate(new DateTime).map(_.toString)
-    header.union(cdrs).saveAsTextFile("test.txt")
+    header.union(cdrs).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
     sc.stop()
 	}
 }

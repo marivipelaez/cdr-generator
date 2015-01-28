@@ -84,6 +84,14 @@ object TAC{
 	}
 }
 
+/**
+ * Companion object of CDR with some static definitions
+ */
+object CDR {
+  val DateTimeFormat  = StaticDateTimeFormat.forPattern("yyyyMMddhhmmss")
+  val FieldSeparator = ","
+}
+
 /** Represent a CDR
  * @param fromUser          User who call/SMS
  * @param toUser            User who receive the call/SMS
@@ -121,7 +129,7 @@ class CDR(
 	 *
 	 * @return  String
 	 */
-	override def toString(): String = this.toString(",")
+	override def toString(): String = this.toString(CDR.FieldSeparator)
 
 	/** CDR fields separate by separator in the same order has the header
 	 * @param separator		The separator
@@ -149,7 +157,7 @@ class CDR(
 			"OPERATOR_1" -> fromUser.operator.name,
 			"OPERATOR_2" -> toUser.operator.name,
 			"DURATION" -> duration.toString,
-			"TIMESTAMP" -> date.toString(StaticDateTimeFormat.forPattern("yyyyMMddhhmmss")),
+			"TIMESTAMP" -> date.toString(CDR.DateTimeFormat),
 			"TERMINATION_STATUS_1" -> TerminationStatus.toString(fromTerminationStatus),
 			"TERMINATION_STATUS_2" -> TerminationStatus.toString(toTerminationStatus),
 			"VALUE_1" -> fromValue.toString,

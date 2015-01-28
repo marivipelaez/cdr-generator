@@ -36,7 +36,7 @@ class CDRSpec extends FlatSpec {
 					case "OPERATOR_1" => assert( f == cdr.fromUser.operator.name )
 					case "OPERATOR_2" => assert( f == cdr.toUser.operator.name )
 					case "DURATION" => assert( f == cdr.duration.toString )
-					case "TIMESTAMP" => assert( f == cdr.date.toString("%y%m%d%h%s") )
+					case "TIMESTAMP" => assert( f == cdr.date.toString(CDR.DateTimeFormat) )
 					case "TERMINATION_STATUS_1" => assert( f == TerminationStatus.toString(cdr.fromTerminationStatus) )
 					case "TERMINATION_STATUS_2" => assert( f == TerminationStatus.toString(cdr.toTerminationStatus) )
 					case "VALUE_1" => assert( f == cdr.fromValue.toString )
