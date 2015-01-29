@@ -18,7 +18,7 @@ object CDRSimulation{
 		val sim = new BasicSimulator(
 			new BasicCellsGenerator(10),
 			new HarcodedOperatorsGenerator(),
-			new BasicUsersGenerator(50),
+			new BasicSpanishUsersGenerator(50),
 			new RandomSocialNetworkGenerator()
 		)
     val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
