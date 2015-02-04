@@ -22,8 +22,10 @@ object CDRSimulation{
 			new RandomSocialNetworkGenerator()
 		)
     val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
-    val cdrs = sim.simulate(new DateTime).map(_.toString)
-    header.union(cdrs).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
+    val (users, cdrs) = sim.simulate(new DateTime)
+    
+    header.union(cdrs.map(_.toString)).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
+    users.map(_.toString()).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_users_simulator.txt")
     sc.stop()
 	}
 }

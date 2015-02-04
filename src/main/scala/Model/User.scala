@@ -9,7 +9,7 @@ import java.util.Random
  * @param id       The User Id
  * @param operator The user Operator
  */
-abstract class User( val id: Long, var operator : Operator) extends Serializable{
+abstract class User( val id: Long, var operator : Operator) extends Serializable {
 	
 	/** Check if this user can call the other user at that date for that duration.
 	 *
@@ -74,6 +74,36 @@ abstract class User( val id: Long, var operator : Operator) extends Serializable
 	 * @return          The cost
 	 */
 	def recieverCost(from: User, date: DateTime, duration: Int, cdrType: CDRType): Double
+  
+  val FieldSeparator = ","
+  
+  /** User fields separate by a "," 
+   *  
+   * @return  String
+   */
+  override def toString(): String = this.toString(FieldSeparator)
+
+  /** User fields separated by separator
+   *   
+   * @param separator   The separator
+   * @return  String    The concatenation of the user fields
+   */
+  def toString(separator: String): String = {
+    val tmp = this.toMap().values.mkString(separator)
+    println(tmp)
+    tmp
+  }
+  
+   /** Map with user definition fields 
+   * 
+   * @return  Map  With the user definition fields
+   */
+  private def toMap() = {
+    Map(
+      "PHONE_NUMBER" -> id.toString,
+      "OPERATOR" -> operator.name
+    )
+  }
 
 }
 

@@ -18,10 +18,11 @@ abstract class Simulator(
 ){
 
 	/** Generate one day of cdr based on the results of the other generator
+   *  
 	 * @param  day 
-	 * @return     CDRs for the day
+	 * @return a tuple with two elements: the generated users and CDRs for the day
 	 */
-	def simulate(day: DateTime) : org.apache.spark.rdd.RDD[CDR]
+	def simulate(day: DateTime) : (org.apache.spark.rdd.RDD[User], org.apache.spark.rdd.RDD[CDR])
 
 }
 
@@ -33,7 +34,7 @@ class BasicSimulator(
 )extends Serializable{
 	protected val rand = new Random
 
-	def simulate(day: DateTime) : org.apache.spark.rdd.RDD[CDR] = {
+	def simulate(day: DateTime) : (org.apache.spark.rdd.RDD[User], org.apache.spark.rdd.RDD[CDR]) = {
 		val operators = operatorsGenerator.generate()
 		val cells = cellsGenerator.generate(operators)
 		val users = usersGenerator.generate(cells, operators)
@@ -56,7 +57,7 @@ class BasicSimulator(
 						)
 		}
     
-		cdrs ++ centralCdrs
+		(users, cdrs ++ centralCdrs)
 	}
 
 	def randomCDR(userA: User, userB: User, day: DateTime): CDR = {
