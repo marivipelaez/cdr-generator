@@ -75,6 +75,13 @@ abstract class User( val id: Long, var operator : Operator) extends Serializable
 	 */
 	def recieverCost(from: User, date: DateTime, duration: Int, cdrType: CDRType): Double
   
+  /**
+   * Check if the user is in roaming on the given day
+   * 
+   * @param date  The date of the simulation 
+   */
+  def isInRoaming(date: DateTime): Boolean
+  
   val FieldSeparator = ","
   
   /** User fields separate by a "," 
@@ -131,6 +138,10 @@ class DumUser( id: Long, operator: Operator, cell: Cell ) extends User(id, opera
 	override def recieverCost(from: User, date: DateTime, duration: Int, cdrType: CDRType): Double = {
 		if( rand.nextDouble < 0.9 ) rand.nextDouble else 0.0
 	}
+  
+  override def isInRoaming(date: DateTime): Boolean = {
+    rand.nextBoolean()
+  }
 }
 
 /** Default DumUser for testing

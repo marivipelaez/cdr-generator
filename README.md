@@ -10,7 +10,7 @@ that we can use any implementation for a step very easily.
 - Generate the operator
 - Generate the users (operators, cells, schedule, wallet,...)
 - Generate the social network
-- finally with all those informations use a simulator to simulate one day
+- finally with all those information use a simulator to simulate one day
     There are multiple simulators possible
     - Iterate over the social graph
     - Go through each id and generate the cdr's according to some distributions
@@ -35,9 +35,26 @@ To compile and run the test :
 
 	sbt "~test-quick"
 
-To run :
+To run and simulate CDRS only :
 
 	sbt run
+
+
+To run and simulate users and CDRS :
+
+    sbt "run users-cdrs"
+    
+To run and simulate DDRS only :
+
+    sbt "run ddrs"
+
+To run and simulate users and DDRS :
+
+    sbt "run users-ddrs"
+    
+To run and simulate users, CDRS and DDRS :
+
+    sbt "run all"
 
 To generate the scala doc (in target scala-../api) :
 
@@ -64,7 +81,7 @@ To generate the scala doc (in target scala-../api) :
 
 **Simulator** :
 
-- **BasicSimulator** : Generate cdr in one pass over the edges of the social graph
+- **BasicSimulator** : Generate cdr in one pass over the edges of the social graph and ddrs for a day for those users
    
 # Structure :
 Source structure :
