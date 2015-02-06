@@ -1,8 +1,8 @@
 # CDR generator
 
 The goal is to generate CDR based on different model and to allow model "mix in".  
-To achieve that, the generation of the CDR is break down in differents generals steps and for each
-steps, there are multiple implementations which respect a common interface. This implies
+To achieve that, the generation of the CDR is break down in different general steps and for each
+step, there are multiple implementations which respect a common interface. This implies
 that we can use any implementation for a step very easily.  
 
 # Generation Steps
@@ -61,6 +61,7 @@ To generate the scala doc (in target scala-../api) :
 	sbt doc
 
 # Existing implementation step
+
 **CellsGenerator** :
 
 - **BasicCellsGenerator** : Generate cells randomly in "square".
@@ -82,6 +83,8 @@ To generate the scala doc (in target scala-../api) :
 **Simulator** :
 
 - **BasicSimulator** : Generate cdr in one pass over the edges of the social graph and ddrs for a day for those users
+- **NormalSimulator** : Generate cdr in one pass over the edges of the social graph and ddrs for a day for those users, 
+using a gaussian distribution for the duration of the calls and the uplink and downlink consumptions.
    
 # Structure :
 Source structure :

@@ -16,7 +16,7 @@ import model.DDR
 
 object CDRSimulation{
 	def main(args: Array[String]){
-		val sim = new BasicSimulator(
+		val sim = new NormalSimulator(
 			new BasicCellsGenerator(10),
 			new HarcodedOperatorsGenerator(),
 			new BasicSpanishUsersGenerator(50),

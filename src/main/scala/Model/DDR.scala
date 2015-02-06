@@ -72,9 +72,9 @@ class DDR(
 			"UPLINK_ROAMING" -> uplinkRoaming,
       "DOWNLINK_ROAMING" -> downlinkRoaming,
 			"VALUE_UPLINK" -> valueUplink,
-      "VAUE_DOWNLINK" -> valueDownlink,
+      "VALUE_DOWNLINK" -> valueDownlink,
 			"VALUE_UPLINK_ROAMING" -> valueUplinkRoaming,
-      "VAUE_DOWNLINK_ROAMING" -> valueDownlinkRoaming
+      "VAULE_DOWNLINK_ROAMING" -> valueDownlinkRoaming
 		)
 	}
 }
