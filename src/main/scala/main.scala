@@ -14,54 +14,65 @@ import model.DefaultDDR
 import model.CDR
 import model.DDR
 
+
 object CDRSimulation{
+  val usage = """
+    Usage: CDRSimulation [--data (cdrs, ddrs, users-cdrs, users-ddrs, all)] [--num-users num] [--interval num] [--num-cells num]
+
+     * data identifies which kind of data is to be simulated. If not present only cdrs will be simulated.
+     * num-users shows the number of users in the simulation. By default, 50 users will be generated.
+     * interval number of days in the simulation. If not present a single day will be generated.
+     * num-cells number of cells generated. By default, 10 cells will be used.
+  """
+  val validData: List[String] = List("cdrs", "ddrs", "users-cdrs", "users-ddrs", "all")
+  
 	def main(args: Array[String]){
+    
+    // Get args 
+    val arglist = args.toList
+    type OptionMap = Map[Symbol, Any]
+    
+    def nextOption(map: OptionMap, list: List[String]) : OptionMap = {
+      def isSwitch(s: String) = (s(0) == '-')
+      list match {
+        case Nil => map
+        case "--data" :: value :: tail => nextOption(map ++ Map('data -> value.toString), tail)
+        case "--num-users" :: value :: tail => nextOption(map ++ Map('numusers -> value.toInt), tail)
+        case "--interval" :: value :: tail => nextOption(map ++ Map('interval -> value.toInt), tail)
+        case "--num-cells" :: value :: tail => nextOption(map ++ Map('numcells -> value.toInt), tail)
+        case _ :: tail => nextOption(map, tail)
+      }
+    }
+    
+    val options = nextOption(Map(), arglist)
+    
+    println(options)
+    
+    val simulatedData = options.getOrElse('data, null).asInstanceOf[String]
+    val numUsers = options.getOrElse('numusers, 50).asInstanceOf[Int]
+    val interval = options.getOrElse('interval, 0).asInstanceOf[Int]
+    val numCells = options.getOrElse('numcells, 10).asInstanceOf[Int]
+    
+    if (simulatedData != null && !validData.contains(simulatedData)){
+      println(usage)
+      System.exit(0)
+    }
+    
+    println(simulatedData + " " + numUsers + " " + interval + " " + numCells)
+    
 		val sim = new NormalSimulator(
-			new BasicCellsGenerator(10),
+			new BasicCellsGenerator(numCells),
 			new HarcodedOperatorsGenerator(),
-			new BasicSpanishUsersGenerator(50),
+			new BasicSpanishUsersGenerator(numUsers),
 			new RandomSocialNetworkGenerator()
 		)
     
-    // Get args 
-    val simulatedData = if (args.length > 0) args(0) else null
     
-    simulatedData match {
-      case "users-cdrs" => {
-        val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
-        val (users, cdrs) = sim.simulateUsersAndCdrs(new DateTime)
-    
-        header.union(cdrs.map(_.toString)).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
-        users.map(_.toString()).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_users_simulator.txt") 
-      }
-      case "ddrs" => {
-        val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultDDR.header(DDR.FieldSeparator).split(DDR.FieldSeparator).map(_.toString))
-        val ddrs = sim.simulateDdrs(new DateTime)
-        
-        header.union(ddrs.map(_.toString)).saveAsTextFile(new DateTime().toString(DDR.DateTimeFormat) + "_ddrs_simulator.txt")
-      }
-      case "users-ddrs" => {
-        val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(DDR.FieldSeparator).split(DDR.FieldSeparator).map(_.toString))
-        val (users, ddrs) = sim.simulateUsersAndDdrs(new DateTime)
-    
-        header.union(ddrs.map(_.toString)).saveAsTextFile(new DateTime().toString(DDR.DateTimeFormat) + "_ddrs_simulator.txt")
-        users.map(_.toString()).saveAsTextFile(new DateTime().toString(DDR.DateTimeFormat) + "_users_simulator.txt") 
-      }
-      case "all" => {
-        val cdrHeader: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
-        val ddrHeader: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultDDR.header(DDR.FieldSeparator).split(DDR.FieldSeparator).map(_.toString))
-        val (users, cdrs, ddrs) = sim.simulateUsersCdrsAndDdrs(new DateTime)
-        
-        cdrHeader.union(cdrs.map(_.toString)).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
-        ddrHeader.union(ddrs.map(_.toString)).saveAsTextFile(new DateTime().toString(DDR.DateTimeFormat) + "_ddrs_simulator.txt")
-        users.map(_.toString()).saveAsTextFile(new DateTime().toString(DDR.DateTimeFormat) + "_users_simulator.txt") 
-      }
-      case _ => {
-        val header: org.apache.spark.rdd.RDD[String] = sc.parallelize(DefaultCDR.header(CDR.FieldSeparator).split(CDR.FieldSeparator).map(_.toString))
-        val cdrs = sim.simulate(new DateTime)
-        
-        header.union(cdrs.map(_.toString)).saveAsTextFile(new DateTime().toString(CDR.DateTimeFormat) + "_simulator.txt")
-      }
+    if (interval < 2) {
+      val simulation = new DailySimulation(simulatedData, sim)
+      simulation.simulation() 
+    } else {
+      println("For the moment only daily simulations are available")
     }
     
     sc.stop()
