@@ -19,6 +19,10 @@ abstract class Simulator(
   val socialNetworkGenerator: SocialNetworkGenerator
 ) extends Serializable {
   
+    
+  val users: org.apache.spark.rdd.RDD[User]
+  val socialNetwork: Graph[User, Relation]
+  
   /** Generate one day of CDR based on the results of the other generators
    *  
    * @param  day 
@@ -59,6 +63,7 @@ abstract class Simulator(
 
 }
 
+
 class BasicSimulator(
     override val cellsGenerator: CellsGenerator,
     override val operatorsGenerator: OperatorsGenerator,
@@ -67,14 +72,14 @@ class BasicSimulator(
     ) extends Simulator(cellsGenerator, operatorsGenerator, usersGenerator, socialNetworkGenerator) {
   
 	protected val rand = new Random
+  val operators = operatorsGenerator.generate()
+  val cells = cellsGenerator.generate(operators)
+  override val users = usersGenerator.generate(cells, operators)
+  override val socialNetwork = socialNetworkGenerator.generate(users)
 
+  
 	override def simulate(day: DateTime) : org.apache.spark.rdd.RDD[CDR] = {
     
-		val operators = operatorsGenerator.generate()
-		val cells = cellsGenerator.generate(operators)
-		val users = usersGenerator.generate(cells, operators)
-		val socialNetwork = socialNetworkGenerator.generate(users)
-
 		val cdrs = generateCDRs(users, socialNetwork, operators, cells, day)
     
 	  cdrs
@@ -82,11 +87,6 @@ class BasicSimulator(
   
   override def simulateUsersAndCdrs(day: DateTime):
   (org.apache.spark.rdd.RDD[User], org.apache.spark.rdd.RDD[CDR]) = {
-    
-    val operators = operatorsGenerator.generate()
-    val cells = cellsGenerator.generate(operators)
-    val users = usersGenerator.generate(cells, operators)
-    val socialNetwork = socialNetworkGenerator.generate(users)
 
     val cdrs = generateCDRs(users, socialNetwork, operators, cells, day)
     
@@ -95,10 +95,6 @@ class BasicSimulator(
   
   override def simulateDdrs(day: DateTime): org.apache.spark.rdd.RDD[DDR] = {
     
-    val operators = operatorsGenerator.generate()
-    val cells = cellsGenerator.generate(operators)
-    val users = usersGenerator.generate(cells, operators)
-
     val ddrs = generateDDRs(users, operators, cells, day)
     
     ddrs
@@ -109,10 +105,6 @@ class BasicSimulator(
       org.apache.spark.rdd.RDD[DDR]
       ) = {
     
-    val operators = operatorsGenerator.generate()
-    val cells = cellsGenerator.generate(operators)
-    val users = usersGenerator.generate(cells, operators)
-
     val ddrs = generateDDRs(users, operators, cells, day)
     
     (users, ddrs)
@@ -124,11 +116,6 @@ class BasicSimulator(
       org.apache.spark.rdd.RDD[DDR]
       ) = {
     
-    val operators = operatorsGenerator.generate()
-    val cells = cellsGenerator.generate(operators)
-    val users = usersGenerator.generate(cells, operators)
-    val socialNetwork = socialNetworkGenerator.generate(users)
-
     val cdrs = generateCDRs(users, socialNetwork, operators, cells, day)
     val ddrs = generateDDRs(users, operators, cells, day)
     
