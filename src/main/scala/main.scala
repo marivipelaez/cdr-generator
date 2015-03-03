@@ -21,7 +21,8 @@ object CDRSimulation{
 
      * data identifies which kind of data is to be simulated. If not present only cdrs will be simulated.
      * num-users shows the number of users in the simulation. By default, 50 users will be generated.
-     * interval number of days in the simulation. If not present a single day will be generated.
+     * interval number of days in the simulation, from the present day to interval-days in the past. 
+                If not present a single day will be generated.
      * num-cells number of cells generated. By default, 10 cells will be used.
   """
   val validData: List[String] = List("cdrs", "ddrs", "users-cdrs", "users-ddrs", "all")
@@ -50,7 +51,7 @@ object CDRSimulation{
     
     val simulatedData = options.getOrElse('data, null).asInstanceOf[String]
     val numUsers = options.getOrElse('numusers, 50).asInstanceOf[Int]
-    val interval = options.getOrElse('interval, 0).asInstanceOf[Int]
+    val interval = options.getOrElse('interval, 1).asInstanceOf[Int]
     val numCells = options.getOrElse('numcells, 10).asInstanceOf[Int]
     
     if (simulatedData != null && !validData.contains(simulatedData)){
@@ -58,8 +59,7 @@ object CDRSimulation{
       System.exit(0)
     }
     
-    println(simulatedData + " " + numUsers + " " + interval + " " + numCells)
-    
+    // Create the simulator of your choice. If it does not exist, define it!
 		val sim = new NormalSimulator(
 			new BasicCellsGenerator(numCells),
 			new HarcodedOperatorsGenerator(),
@@ -67,13 +67,12 @@ object CDRSimulation{
 			new RandomSocialNetworkGenerator()
 		)
     
-    
-    if (interval < 2) {
-      val simulation = new DailySimulation(simulatedData, sim)
-      simulation.simulation() 
-    } else {
-      println("For the moment only daily simulations are available")
-    }
+    // Run a simulation from today till interval days in the past
+    val simulation = new DailySimulation(simulatedData, sim)
+    val simDate = new DateTime
+    for (i <- 0 until interval) {
+      simulation.simulation(simDate - i.days) 
+    } 
     
     sc.stop()
 	}

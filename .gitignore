@@ -1,4 +1,3 @@
-project/*
 target/*
 tags/*
 tags
@@ -13,5 +12,5 @@ tags
 .classpath
 .settings
 *test.txt*
-*_simulator.txt*
-
+/simulations/
+/project/
