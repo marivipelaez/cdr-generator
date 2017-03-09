@@ -17,13 +17,14 @@ import model.DDR
 
 object CDRSimulation{
   val usage = """
-    Usage: CDRSimulation [--data (cdrs, ddrs, users-cdrs, users-ddrs, all)] [--num-users num] [--interval num] [--num-cells num]
+    Usage: CDRSimulation [--data (cdrs, ddrs, users-cdrs, users-ddrs, all)] [--num-users num] [--interval num] [--num-cells num] [--users-file]
 
      * data identifies which kind of data is to be simulated. If not present only cdrs will be simulated.
      * num-users shows the number of users in the simulation. By default, 50 users will be generated.
      * interval number of days in the simulation, from the present day to interval-days in the past. 
                 If not present a single day will be generated.
      * num-cells number of cells generated. By default, 10 cells will be used.
+     * users-file absolute path to the csv file containing the users and its operator name
   """
   val validData: List[String] = List("cdrs", "ddrs", "users-cdrs", "users-ddrs", "all")
   
@@ -41,6 +42,7 @@ object CDRSimulation{
         case "--num-users" :: value :: tail => nextOption(map ++ Map('numusers -> value.toInt), tail)
         case "--interval" :: value :: tail => nextOption(map ++ Map('interval -> value.toInt), tail)
         case "--num-cells" :: value :: tail => nextOption(map ++ Map('numcells -> value.toInt), tail)
+        case "--users-file" :: value :: tail => nextOption(map ++ Map('usersFile -> value.toString), tail)
         case _ :: tail => nextOption(map, tail)
       }
     }
@@ -53,6 +55,7 @@ object CDRSimulation{
     val numUsers = options.getOrElse('numusers, 50).asInstanceOf[Int]
     val interval = options.getOrElse('interval, 1).asInstanceOf[Int]
     val numCells = options.getOrElse('numcells, 10).asInstanceOf[Int]
+    val usersFile = options.getOrElse('usersFile, null).asInstanceOf[String]
     
     if (simulatedData != null && !validData.contains(simulatedData)){
       println(usage)
@@ -60,12 +63,22 @@ object CDRSimulation{
     }
     
     // Create the simulator of your choice. If it does not exist, define it!
-		val sim = new NormalSimulator(
-			new BasicCellsGenerator(numCells),
-			new HarcodedOperatorsGenerator(),
-			new BasicSpanishUsersGenerator(numUsers),
-			new RandomSocialNetworkGenerator()
-		)
+         
+    var sim = new NormalSimulator(
+        new BasicCellsGenerator(numCells),
+        new HarcodedOperatorsGenerator(),
+        new BasicSpanishUsersGenerator(numUsers),
+        new RandomSocialNetworkGenerator()
+      )
+    
+    if(usersFile != null) {
+      sim = new NormalSimulator(
+        new BasicCellsGenerator(numCells),
+        new HarcodedOperatorsGenerator(),
+        new FileSpanishUsersGenerator(numUsers, usersFile),
+        new RandomSocialNetworkGenerator()
+      )
+    }
     
     // Run a simulation from today till interval days in the past
     val simulation = new DailySimulation(simulatedData, sim)

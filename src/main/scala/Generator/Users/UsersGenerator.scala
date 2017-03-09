@@ -79,3 +79,39 @@ class BasicSpanishUsersGenerator(nUsers: Int) extends UsersGenerator {
   }
 }
 
+/**
+ * Generates an array of Spanish mobile numbers.
+ * 
+ * @param nUsers        Number of random users to be generated
+ */
+class FileSpanishUsersGenerator(nUsers: Int, usersFile: String) extends UsersGenerator {
+  protected val rand = new Random
+
+  override def generate(
+    cells: Array[Cell],
+    operators: Array[Operator] 
+    ) : org.apache.spark.rdd.RDD[User] = {
+    
+      def getOperator(name: String): Operator = 
+//         for(op <- operators) {
+//          if(op.name == name) {
+//            return op
+//          }
+        operators(0)
+        
+     //Read users file
+      val lines = sc.textFile(usersFile)
+      
+      val users = lines.map(line => line.split(","))
+      users.map(user => new DumUser(user(0).toLong, getOperator(user(1)), sampleCells(cells)(0)))
+
+  }
+
+  def sampleCells(cells: Array[Cell]): Array[Cell] = {
+    val size = rand.nextInt(cells.length);
+    val set = Set( 0 to size map{_ =>
+        cells(rand.nextInt(cells.length))
+      } :_*)
+    set.toArray
+  }
+}
